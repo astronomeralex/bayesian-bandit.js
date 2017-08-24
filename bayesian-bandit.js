@@ -1,5 +1,5 @@
 var jStat = require('jStat').jStat;
-var math = require('mathjs');
+var mathjs = require('mathjs');
 
 (function(exports) {
 
@@ -88,7 +88,7 @@ var math = require('mathjs');
     return jStat.beta.sample(a,b);
   }
 
-  Arm.prototype.random = Math.random;
+//  Arm.prototype.random = Math.random;
 
   ///////////////////////////////////////////////////////////////////////////
   // Bandit - the n-armed bandit which selects arms from observed rewards. //
@@ -187,12 +187,12 @@ var math = require('mathjs');
   Bandit.prototype.g_test = function(success, failure) {
   //do g_test and return p value
   // TODO: need to deal with zeros in success and failure. don't work for the g-test
-  var trials = math.add(success, failure);
-  var expected_freq = math.sum(success) / math.sum(trials);
-  var expected_success = math.multiply(trials, expected_freq);
-  var expected_failure = math.multiple(trials, 1 - expected_freq);
-  var gsuccess = math.multiply(2,math.sum( math.multiply(success,math.log(math.divide(success, expected_success)))));
-  var gfailure = math.multiply(2,math.sum( math.multiply(failure,math.log(math.divide(failure, expected_failure)))));
+  var trials = mathjs.add(success, failure);
+  var expected_freq = mathjs.sum(success) / mathjs.sum(trials);
+  var expected_success = mathjs.multiply(trials, expected_freq);
+  var expected_failure = mathjs.multiple(trials, 1 - expected_freq);
+  var gsuccess = mathjs.multiply(2,mathjs.sum( mathjs.multiply(success,mathjs.log(mathjs.divide(success, expected_success)))));
+  var gfailure = mathjs.multiply(2,mathjs.sum( mathjs.multiply(failure,mathjs.log(mathjs.divide(failure, expected_failure)))));
   var g  = gsuccess + gfailure;
   var ddof =  success.length - 1; // (number of rows - 1)(number of columns - 1) always have two rows
   //get chisq distribution value
@@ -209,7 +209,7 @@ var math = require('mathjs');
   var c = failure[0];
   var d = failure[1];
   var n = a + b + c + d;
-  var pvalue = math.combinations(a+b, a) * math.combinations(c + d, c) / math.combinations(n, a + c);
+  var pvalue = mathjs.combinations(a+b, a) * mathjs.combinations(c + d, c) / mathjs.combinations(n, a + c);
   return pvalue
   }
   
