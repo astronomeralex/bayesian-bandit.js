@@ -150,30 +150,36 @@ var mathjs = require('mathjs');
   //
   if (this.arms.length == 1) {
     //don't do anything and return
-    return 1;
+    return [];
     }
   var success = [];
   var tries = [];
   for (var armIndex = 0; armIndex < this.arms.length; armIndex++) {
-    success.push(this.arms[armIndex].sum);
-    tries.push(this.arms[armIndex].count);
+    tries.push(this.arms[armIndex].sum);
+    success.push(this.arms[armIndex].count);
     }
-  var failure = math.subtract(tries,success);
-  var ctr = math.divide(success / tries)
+  var failure = mathjs.subtract(tries, success);
+  var ctr = mathjs.dotDivide(success, tries)
+  //console.log(success);
+  //console.log(tries);
+  //console.log(failure);
+  //console.log(ctr);
   //get index of best ctr
   var best_ctr_idx = -1;
   var best_ctr = -1;
-  for (var i = 0; i < ctr.length; ctr++) {
+  for (var i = 0; i < ctr.length; i++) {
     if (ctr[i] > best_ctr){
       best_ctr_idx = i
       best_ctr = ctr[i]
       }
     }
+  //console.log(best_ctr)
+  //console.log(best_ctr_idx)
   //now compare each are to the best arm using fisher's exact test
   var arms_to_drop = [];
   for (var i = 0; i < ctr.length; i++) {
     if (i != best_ctr_idx){
-      var pvalue = this.fisher_exact([success[best_ctr_idx], success[i]],[failure[best_ctr_idx], failure[i]])
+      var pvalue = this.fisher_exact([success[best_ctr_idx], success[i]],[failure[best_ctr_idx], failure[i]]);
         if(pvalue <= alpha){
           //significance!
           arms_to_drop.push(i)
@@ -183,33 +189,34 @@ var mathjs = require('mathjs');
   return arms_to_drop
   }
   
-  
+  /**  
   Bandit.prototype.g_test = function(success, failure) {
   //do g_test and return p value
   // TODO: need to deal with zeros in success and failure. don't work for the g-test
   var trials = mathjs.add(success, failure);
   var expected_freq = mathjs.sum(success) / mathjs.sum(trials);
-  var expected_success = mathjs.multiply(trials, expected_freq);
-  var expected_failure = mathjs.multiple(trials, 1 - expected_freq);
-  var gsuccess = mathjs.multiply(2,mathjs.sum( mathjs.multiply(success,mathjs.log(mathjs.divide(success, expected_success)))));
-  var gfailure = mathjs.multiply(2,mathjs.sum( mathjs.multiply(failure,mathjs.log(mathjs.divide(failure, expected_failure)))));
+  var expected_success = mathjs.dotMultiply(trials, expected_freq);
+  var expected_failure = mathjs.multiply(trials, 1 - expected_freq);
+  var gsuccess = mathjs.dotMultiply(2,mathjs.sum( mathjs.dotMultiply(success,mathjs.log(mathjs.dotDivide(success, expected_success)))));
+  var gfailure = mathjs.dotMultiply(2,mathjs.sum( mathjs.dotMultiply(failure,mathjs.log(mathjs.dotDivide(failure, expected_failure)))));
   var g  = gsuccess + gfailure;
   var ddof =  success.length - 1; // (number of rows - 1)(number of columns - 1) always have two rows
   //get chisq distribution value
   var pvalue = 1 - jStat.chisquare.cdf(g, ddof);
   return pvalue
   }
+  **/
   
   Bandit.prototype.fisher_exact = function(success, failure) {
   //fisher's exact test https://en.wikipedia.org/wiki/Fisher%27s_exact_test
   //only works for a 2x2 contingency table
   //TODO check lengths here to make sure they're both 2
-  var a = success[0];
-  var b = success[1];
-  var c = failure[0];
-  var d = failure[1];
-  var n = a + b + c + d;
-  var pvalue = mathjs.combinations(a+b, a) * mathjs.combinations(c + d, c) / mathjs.combinations(n, a + c);
+  var a = mathjs.bignumber(success[0]);
+  var b = mathjs.bignumber(success[1]);
+  var c = mathjs.bignumber(failure[0]);
+  var d = mathjs.bignumber(failure[1]);
+  var n = mathjs.add(a,b,c,d);
+  var pvalue = mathjs.divide(mathjs.multiply(mathjs.combinations(mathjs.add(a,b), a),mathjs.combinations(mathjs.add(c,d), c)),mathjs.combinations(n,mathjs.add(a,c)));
   return pvalue
   }
   
