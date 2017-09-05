@@ -155,8 +155,8 @@ var mathjs = require('mathjs');
   var success = [];
   var tries = [];
   for (var armIndex = 0; armIndex < this.arms.length; armIndex++) {
-    tries.push(this.arms[armIndex].sum);
-    success.push(this.arms[armIndex].count);
+    tries.push(this.arms[armIndex].count);
+    success.push(this.arms[armIndex].sum);
     }
   var failure = mathjs.subtract(tries, success);
   var ctr = mathjs.dotDivide(success, tries)
