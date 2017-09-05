@@ -108,9 +108,10 @@ var mathjs = require('mathjs');
    *
    * @constructor
      */
-  function Bandit(options) {
+  function Bandit(options, logger) {
 
     this.arms = []
+    this.logger = logger
 
     // If options.arms is explicitly passed, initialize the arms array with it
     if (options && options.arms) {
@@ -160,10 +161,10 @@ var mathjs = require('mathjs');
     }
   var failure = mathjs.subtract(tries, success);
   var ctr = mathjs.dotDivide(success, tries)
-  //console.log(success);
-  //console.log(tries);
-  //console.log(failure);
-  //console.log(ctr);
+  this.logger.info(success);
+  this.logger.info(tries);
+  this.logger.info(failure);
+  this.logger.info(ctr);
   //get index of best ctr
   var best_ctr_idx = -1;
   var best_ctr = -1;
@@ -186,7 +187,8 @@ var mathjs = require('mathjs');
           }
       }
     }
-  return arms_to_drop
+  this.logger.info("Bandit: check_convergence: arms_to_drop ", arms_to_drop);
+  return arms_to_drop;
   }
   
   /**  
